@@ -9,6 +9,9 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
+  images: {
+    domains: ['www.aganitha.ai'],
+  },
 };
 
 export default nextConfig;
