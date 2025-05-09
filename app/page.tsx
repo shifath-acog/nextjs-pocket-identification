@@ -150,11 +150,20 @@ export default function Home() {
   };
 
   return (
+    <>
+   <header className="w-full px-6 py-4 bg-white border-b border-gray-300 shadow-md flex justify-start items-center">
+        <img
+          src="https://www.aganitha.ai/wp-content/uploads/2023/05/aganitha-logo.png"
+          alt="Aganitha Logo"
+          className="h-10"
+        />
+         </header>
     <div className="container mx-auto p-4 sm:p-6 lg:p-8 min-h-screen flex flex-col bg-gray-50 dark:bg-gray-900">
+      
       <h1
-        className="text-7xl sm:text-5xl md:text-7xl font-extrabold text-center mb-10 md:mb-12 mt-6 md:mt-8 text-gray-800 dark:text-gray-100 dark:bg-gray-800 py-4 px-6"
+        className="text-7xl sm:text-5xl md:text-7xl font-extrabold text-center mb-10 md:mb-12 mt-3 md:mt-8 text-gray-800 dark:text-gray-100 dark:bg-gray-800 py-4 px-6"
       >
-        Protein Pocket Visualization
+         PocketPredict
       </h1>
 
       {/* Row 1: Form and Tables */}
@@ -319,5 +328,6 @@ export default function Home() {
         </div>
       )}
     </div>
+    </>
   );
 }
