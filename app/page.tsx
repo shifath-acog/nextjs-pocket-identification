@@ -99,7 +99,7 @@ export default function Home() {
     if (!data || data.length === 0) return;
 
     const headers = Object.keys(data[0]) as (keyof GraspData)[];
-    
+
     const escapeCsvValue = (value: string) => {
       if (typeof value !== 'string') return value;
       if (value.includes(',') || value.includes('"') || value.includes('\n')) {
@@ -129,7 +129,7 @@ export default function Home() {
 
   const pocketOptions = () => {
     if (selectedViz === 'GrASP' && graspData) {
-      return ['All Pockets', ...graspData.map((_, i) => `Pocket ${i + 1}`)];
+      return ['All Pockets', 'Pocket 1', 'Pocket 2']; // Hardcode to only show Pocket 1 and Pocket 2 for GRaSP
     } else if (selectedViz === 'P2Rank' && p2rankData) {
       return ['All Pockets', ...p2rankData.map((_, i) => `Pocket ${i + 1}`)];
     }
@@ -137,7 +137,18 @@ export default function Home() {
   };
 
   const getSelectedPockets = () => {
-    const pockets = selectedViz === 'GrASP' ? graspPockets : p2rankPockets;
+    let pockets = selectedViz === 'GrASP' ? graspPockets : p2rankPockets;
+    if (selectedViz === 'GrASP') {
+      // For GRaSP, only include pocket1 and pocket2
+      pockets = {
+        pocket1: graspPockets.pocket1 || [],
+        pocket2: graspPockets.pocket2 || [],
+      };
+      // Log if pocket1 or pocket2 are missing
+      if (!graspPockets.pocket1) console.log('Warning: pocket1 missing in graspPockets');
+      if (!graspPockets.pocket2) console.log('Warning: pocket2 missing in graspPockets');
+    }
+
     if (selectedPocket === 'All Pockets') {
       console.log('All pockets for', selectedViz, ':', pockets);
       return pockets;
@@ -265,8 +276,7 @@ export default function Home() {
               </div>
             )}
           </div>
-
-            </div>
+        </div>
 
         {/* Row 2: Visualization with Dropdowns */}
         {(graspData || p2rankData) && pdbContent && (
