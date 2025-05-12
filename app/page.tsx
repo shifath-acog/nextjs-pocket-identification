@@ -214,7 +214,17 @@ export default function Home() {
             {graspData && (
               <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-gray-200 dark:border-gray-700 mb-6">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Pockets identified by GrASP</h2>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Pockets identified by GrASP</h2>
+                    <div className="relative group">
+                      <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-600 rounded-full cursor-pointer">
+                        i
+                      </span>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 w-96 p-2 text-sm text-gray-100 bg-gray-800 dark:bg-gray-200 dark:text-gray-900 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        GRaSP is a method for identifying druggable binding sites using graph neural networks with attention [J. Chem. Inf. Model. 2024, 64, 7, 2637–2644]
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => downloadCSV(graspData.slice(0, 2), 'grasp_pockets.csv')}
                     className="bg-gray-900 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors duration-200"
@@ -231,7 +241,17 @@ export default function Home() {
             {p2rankData && (
               <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-gray-200 dark:border-gray-700">
                 <div className="flex justify-between items-center mb-4">
-                  <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Pockets identified by P2Rank</h2>
+                  <div className="flex items-center space-x-2">
+                    <h2 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Pockets identified by P2Rank</h2>
+                    <div className="relative group">
+                      <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-semibold text-gray-800 dark:text-gray-200 bg-gray-200 dark:bg-gray-600 rounded-full cursor-pointer">
+                        i
+                      </span>
+                      <div className="absolute left-1/2 transform -translate-x-1/2 bottom-full mb-2 w-96 p-2 text-sm text-gray-100 bg-gray-800 dark:bg-gray-200 dark:text-gray-900 rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+                        P2Rank a machine learning-based method for prediction of ligand binding sites from protein structure [J Cheminform. 2018, 10, 39]
+                      </div>
+                    </div>
+                  </div>
                   <button
                     onClick={() => downloadCSV(p2rankData, 'p2rank_pockets.csv')}
                     className="bg-gray-900 text-white font-semibold py-2 px-4 rounded-md hover:bg-gray-800 transition-colors duration-200"
@@ -245,7 +265,8 @@ export default function Home() {
               </div>
             )}
           </div>
-        </div>
+
+            </div>
 
         {/* Row 2: Visualization with Dropdowns */}
         {(graspData || p2rankData) && pdbContent && (
