@@ -111,7 +111,7 @@ export default function Home() {
     const csvRows = [
       headers.join(','),
       ...data.map((row) =>
-        headers.map((header) => escapeCsvValue(row[header])).join(',')
+        headers.map((header) => escapeCsvValue(String(row[header]))).join(',')
       ),
     ];
     const csvContent = csvRows.join('\n');
@@ -136,18 +136,17 @@ export default function Home() {
     return ['All Pockets'];
   };
 
-  const getSelectedResidues = () => {
+  const getSelectedPockets = () => {
     const pockets = selectedViz === 'GrASP' ? graspPockets : p2rankPockets;
     if (selectedPocket === 'All Pockets') {
-      const allResidues = Object.values(pockets).flat();
-      console.log('All residues for', selectedViz, ':', allResidues);
-      return allResidues;
+      console.log('All pockets for', selectedViz, ':', pockets);
+      return pockets;
     }
     const pocketNumber = parseInt(selectedPocket.split(' ')[1]);
     const pocketKey = `pocket${pocketNumber}`;
-    const residues = pockets[pocketKey] || [];
-    console.log(`Residues for ${selectedViz} ${pocketKey}:`, residues);
-    return residues;
+    const selectedPockets = { [pocketKey]: pockets[pocketKey] || [] };
+    console.log(`Selected pocket ${selectedViz} ${pocketKey}:`, selectedPockets);
+    return selectedPockets;
   };
 
   return (
@@ -163,7 +162,7 @@ export default function Home() {
                 <div className="space-y-5">
                   <div>
                     <label htmlFor="pdbId" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
-                      Enter PDB ID:
+                      Enter PDB ID of Protein:
                     </label>
                     <input
                       type="text"
@@ -302,13 +301,7 @@ export default function Home() {
                   </h2>
                   <PDBVisualizer
                     pdbData={pdbContent}
-                    pocketResidues={
-                      selectedPocket === 'All Pockets'
-                        ? selectedViz === 'GrASP'
-                          ? Object.values(graspPockets).flat()
-                          : Object.values(p2rankPockets).flat()
-                        : getSelectedResidues()
-                    }
+                    pocketResidues={getSelectedPockets()}
                   />
                 </div>
               )}

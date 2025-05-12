@@ -57,7 +57,7 @@ export async function parseResponse(response: Response) {
 
         graspData.push({
           Pockets: `Pocket ${i + 1}`,
-          Score: row['prob'] || '0',
+          score: parseFloat(row['prob'] || '0'),
           'Pocket center': `(${parseFloat(row['x'] || '0').toFixed(3)}, ${parseFloat(row['y'] || '0').toFixed(3)}, ${parseFloat(row['z'] || '0').toFixed(3)})`,
           Residues: uniqueResidues.join(', '),
           Atoms: atoms,
@@ -91,7 +91,7 @@ export async function parseResponse(response: Response) {
 
       p2rankData.push({
         Pockets: row['name']?.replace('pocket', 'Pocket ') || `Pocket ${i}`,
-        Score: row['probability'] || '0',
+        score: parseFloat(row['probability'] || '0'),
         'Pocket center': `(${parseFloat(row['center_x'] || '0').toFixed(3)}, ${parseFloat(row['center_y'] || '0').toFixed(3)}, ${parseFloat(row['center_z'] || '0').toFixed(3)})`,
         Residues: combinedResidues,
         Atoms: row['surf_atom_ids']?.split(' ').filter(Boolean).join(', ') || '',

@@ -5,7 +5,7 @@ import * as $3Dmol from '3dmol';
 
 interface PDBVisualizerProps {
   pdbData: string;
-  pocketResidues: { [key: string]: number[] } | number[];
+  pocketResidues: { [key: string]: number[] };
 }
 
 const PDBVisualizer: React.FC<PDBVisualizerProps> = ({ pdbData, pocketResidues }) => {
@@ -32,35 +32,57 @@ const PDBVisualizer: React.FC<PDBVisualizerProps> = ({ pdbData, pocketResidues }
     });
     viewerRef.current = viewer;
 
-    // Load PDB data
-    try {
-      viewer.addModel(pdbData, 'pdb');
+    // Define a color palette for pockets
+    const colors = [
+      'blue', 'green', 'red', 'yellow', 'cyan',
+      'magenta', 'orange', 'purple', 'pink', 'lime'
+    ];
 
-      // Display the protein structure as a grey cartoon
-      viewer.setStyle({}, { cartoon: { color: 'grey' } });
+    // Load PDB data and render
+    const renderStructure = async () => {
+      try {
+        viewer.addModel(pdbData, 'pdb');
 
-      // Normalize pocketResidues to an array and filter out invalid values
-      const residues = Array.isArray(pocketResidues)
-        ? pocketResidues
-        : Object.values(pocketResidues).flat();
-      const validResidues = residues.filter((res): res is number => typeof res === 'number' && !isNaN(res));
+        // Display the protein structure as a grey cartoon
+        viewer.setStyle({}, { cartoon: { color: '#D8D8D8' } });
 
-      // Highlight pocket residues as red spheres
-      if (validResidues.length > 0) {
-        viewer.setStyle(
-          { resi: validResidues },
-          { sphere: { color: 'red', radius: 1.0 } }
-        );
-      } else {
-        console.log('No valid residues to highlight:', residues);
+        // Highlight each pocket with a surface in a different color
+        for (const [pocketKey, residues] of Object.entries(pocketResidues)) {
+          // Filter out invalid residues
+          const validResidues = residues.filter((res): res is number => typeof res === 'number' && !isNaN(res));
+
+          if (validResidues.length > 0) {
+            // Assign a color based on the pocket index, cycling through the palette
+            const index = parseInt(pocketKey.replace('pocket', '')) - 1; // e.g., pocket1 -> 0, pocket2 -> 1
+            const color = colors[index % colors.length];
+
+            // Add a molecular surface for the pocket residues
+            await new Promise<void>((resolve) => {
+              viewer.addSurface(
+                $3Dmol.SurfaceType.MS, // Molecular Surface
+                { color: color, opacity: 1.0 },
+                { resi: validResidues },
+                undefined,
+                undefined,
+                () => resolve() // Callback to resolve the promise when the surface is added
+              );
+            });
+
+            console.log(`Pocket ${pocketKey} surface colored ${color} with residues:`, validResidues);
+          } else {
+            console.log(`No valid residues for pocket ${pocketKey}:`, residues);
+          }
+        }
+
+        // Zoom to fit the structure
+        viewer.zoomTo();
+        viewer.render();
+      } catch (error) {
+        console.error('Error rendering PDB data with 3Dmol:', error);
       }
+    };
 
-      // Zoom to fit the structure
-      viewer.zoomTo();
-      viewer.render();
-    } catch (error) {
-      console.error('Error rendering PDB data with 3Dmol:', error);
-    }
+    renderStructure();
 
     return () => {
       if (viewerRef.current) {
@@ -73,7 +95,7 @@ const PDBVisualizer: React.FC<PDBVisualizerProps> = ({ pdbData, pocketResidues }
   return (
     <div
       ref={containerRef}
-      className="w-full md:w-2/3 mx-auto h-[400px] md:h-[500px] border border-gray-300 rounded-md overflow-hidden relative"
+      className="w-full md:w-2/3 mx-auto h-[300px] md:h-[500px] border border-gray-300 rounded-md overflow-hidden relative"
       style={{ contain: 'strict' }}
     >
       <style jsx>{`

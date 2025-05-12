@@ -2,6 +2,7 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   /* config options here */
+
   output: 'standalone',
   eslint: {
     ignoreDuringBuilds: true,
@@ -12,6 +13,7 @@ const nextConfig: NextConfig = {
   images: {
     domains: ['www.aganitha.ai'],
   },
+
 };
 
 export default nextConfig;

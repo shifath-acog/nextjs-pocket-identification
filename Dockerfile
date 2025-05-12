@@ -36,3 +36,5 @@ ENV NODE_ENV=production
 
 # Start the Next.js app in production mode
 CMD ["node", "server.js"]
+
+#docker run -d --name nextjs-pocket-identification   -p 3004:3000   --network api_connect nextjs-pocket-identification
