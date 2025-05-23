@@ -12,7 +12,7 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to process the PDB file.');
+      throw new Error('Failed to fetch.');
     }
 
 
