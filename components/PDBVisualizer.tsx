@@ -95,7 +95,7 @@ const PDBVisualizer: React.FC<PDBVisualizerProps> = ({ pdbData, pocketResidues }
   return (
     <div
       ref={containerRef}
-      className="w-full md:w-2/3 mx-auto h-[300px] md:h-[500px] border border-gray-300 rounded-md overflow-hidden relative"
+      className="w-full md:w-full mx-auto h-[300px] md:h-[500px] border border-gray-300 rounded-md overflow-hidden relative"
       style={{ contain: 'strict' }}
     >
       <style jsx>{`
