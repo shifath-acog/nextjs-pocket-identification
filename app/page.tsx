@@ -60,7 +60,15 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to process the PDB file.');
+        // Parse the error response from the API route
+        let errorMessage = 'Failed to process the PDB file.';
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || 'An error occurred while processing the PDB file.';
+        } catch (parseError) {
+          console.error('Failed to parse error response:', parseError);
+        }
+        throw new Error(errorMessage);
       }
       console.log('response:', response);
 
@@ -81,7 +89,7 @@ export default function Home() {
         setSelectedViz('P2Rank');
       }
     } catch (err) {
-      setError(err.message || 'An error occurred.');
+      setError(err.message || 'An error occurred while processing the request.');
     } finally {
       setLoading(false);
     }
@@ -198,7 +206,8 @@ export default function Home() {
                     id="pdbFile"
                     accept=".pdb"
                     onChange={handleFileChange}
-                    className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200 dark:hover:file:bg-gray-500"                    disabled={loading}
+                    className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200 dark:hover:file:bg-gray-500"
+                    disabled={loading}
                   />
                 </div>
 

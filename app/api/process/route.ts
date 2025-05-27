@@ -12,18 +12,29 @@ export async function POST(request: NextRequest) {
     });
 
     if (!response.ok) {
-      throw new Error('Failed to fetch.');
+      // Attempt to parse the error response from the GRaSP API
+      let errorMessage = `GRaSP API request failed with status ${response.status}`;
+      try {
+        const errorData = await response.json();
+        // Look for common error fields in the response
+        const message = errorData.error || errorData.message || errorData.detail || JSON.stringify(errorData);
+        errorMessage = `GRaSP API error: ${message} (Status: ${response.status})`;
+      } catch (parseError) {
+        // If parsing fails, use the status text or a generic message
+        errorMessage = `GRaSP API request failed: ${response.statusText || 'Unknown error'} (Status: ${response.status})`;
+      }
+      throw new Error(errorMessage);
     }
-
 
     const contentType = response.headers.get('content-type');
     if (!contentType || !contentType.includes('multipart/form-data')) {
-      throw new Error('Unexpected response format.');
+      throw new Error('Unexpected response format from GRaSP API.');
     }
 
     const data = await parseResponse(response);
     return NextResponse.json(data);
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
