@@ -23,6 +23,7 @@ export default function Home() {
   const [loading, setLoading] = useState<boolean>(false);
   const [selectedViz, setSelectedViz] = useState<'GrASP' | 'P2Rank' | null>(null);
   const [selectedPocket, setSelectedPocket] = useState<string>('All Pockets');
+  const [activeTab, setActiveTab] = useState<'pdbId' | 'pdbFile' | 'alphaFold'>('pdbId'); // Added alphaFold tab
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -34,22 +35,28 @@ export default function Home() {
     setSelectedPocket('All Pockets');
     setLoading(true);
 
-    if (!pdbId && !pdbFile) {
-      setError('Please provide either a PDB ID or upload a PDB file.');
+    if (activeTab === 'pdbId' && !pdbId) {
+      setError('Please provide a PDB ID.');
       setLoading(false);
       return;
     }
-    if (pdbId && pdbFile) {
-      setError('Please provide only one: either a PDB ID or a PDB file, not both.');
+    if (activeTab === 'pdbFile' && !pdbFile) {
+      setError('Please upload a PDB file.');
+      setLoading(false);
+      return;
+    }
+    if (activeTab === 'alphaFold') {
+      // Dummy tab, no submission logic
+      setError('AlphaFold Structure tab is not yet implemented.');
       setLoading(false);
       return;
     }
 
     const formData = new FormData();
-    if (pdbId) {
+    if (activeTab === 'pdbId' && pdbId) {
       formData.append('pdb_id', pdbId);
     }
-    if (pdbFile) {
+    if (activeTab === 'pdbFile' && pdbFile) {
       formData.append('pdb_file', pdbFile);
     }
 
@@ -60,7 +67,6 @@ export default function Home() {
       });
 
       if (!response.ok) {
-        // Parse the error response from the API route
         let errorMessage = 'Failed to process the PDB file.';
         try {
           const errorData = await response.json();
@@ -101,6 +107,20 @@ export default function Home() {
     } else {
       setPdbFile(null);
     }
+  };
+
+  const handleTabChange = (tab: 'pdbId' | 'pdbFile' | 'alphaFold') => {
+    setActiveTab(tab);
+    // Clear other inputs when switching tabs
+    if (tab === 'pdbId') {
+      setPdbFile(null);
+    } else if (tab === 'pdbFile') {
+      setPdbId('');
+    } else if (tab === 'alphaFold') {
+      setPdbId('');
+      setPdbFile(null);
+    }
+    setError(null); // Clear any existing errors
   };
 
   const downloadCSV = (data: GraspData[] | P2RankData[], filename: string) => {
@@ -175,41 +195,94 @@ export default function Home() {
           {/* Input Form - Full Width */}
           <div className="bg-white dark:bg-gray-800 shadow-lg rounded-lg p-6 border border-gray-200 dark:border-gray-700 mb-6 w-4/5 ml-35">
             <form onSubmit={handleSubmit}>
+              {/* Tabs Navigation */}
+              <div className="flex border-b border-gray-200 dark:border-gray-700 mb-4">
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('pdbId')}
+                  className={`flex-1 py-2 px-4 text-center font-medium text-sm rounded-t-lg transition-colors duration-200 ${
+                    activeTab === 'pdbId'
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-b-2 border-blue-500'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  Enter PDB ID
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('pdbFile')}
+                  className={`flex-1 py-2 px-4 text-center font-medium text-sm rounded-t-lg transition-colors duration-200 ${
+                    activeTab === 'pdbFile'
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-b-2 border-blue-500'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  Upload PDB File
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleTabChange('alphaFold')}
+                  className={`flex-1 py-2 px-4 text-center font-medium text-sm rounded-t-lg transition-colors duration-200 ${
+                    activeTab === 'alphaFold'
+                      ? 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-100 border-b-2 border-blue-500'
+                      : 'text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-600'
+                  }`}
+                >
+                  AlphaFold Structure
+                </button>
+              </div>
+
+              {/* Tab Content */}
               <div className="space-y-5">
-                <div>
-                  <label htmlFor="pdbId" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
-                    Enter PDB ID of Protein:
-                  </label>
-                  <input
-                    type="text"
-                    id="pdbId"
-                    value={pdbId}
-                    onChange={(e) => setPdbId(e.target.value)}
-                    placeholder="4NR5 or 4HMN or 1CLJ"
-                    className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
-                    disabled={loading}
-                  />
-                </div>
+                {activeTab === 'pdbId' && (
+                  <div>
+                    <label htmlFor="pdbId" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
+                      Enter PDB ID of Protein:
+                    </label>
+                    <input
+                      type="text"
+                      id="pdbId"
+                      value={pdbId}
+                      onChange={(e) => setPdbId(e.target.value)}
+                      placeholder="4NR5 or 4HMN or 1CLJ"
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      disabled={loading}
+                    />
+                  </div>
+                )}
 
-                <div className="flex items-center justify-center">
-                  <div className="w-1/3 h-px bg-gray-300 dark:bg-gray-600"></div>
-                  <span className="px-4 text-gray-500 dark:text-gray-400 font-medium">OR</span>
-                  <div className="w-1/3 h-px bg-gray-300 dark:bg-gray-600"></div>
-                </div>
+                {activeTab === 'pdbFile' && (
+                  <div>
+                    <label htmlFor="pdbFile" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
+                      Upload a PDB file:
+                    </label>
+                    <input
+                      type="file"
+                      id="pdbFile"
+                      accept=".pdb"
+                      onChange={handleFileChange}
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200 dark:hover:file:bg-gray-500"
+                      disabled={loading}
+                    />
+                  </div>
+                )}
 
-                <div>
-                  <label htmlFor="pdbFile" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
-                    Upload a PDB file:
-                  </label>
-                  <input
-                    type="file"
-                    id="pdbFile"
-                    accept=".pdb"
-                    onChange={handleFileChange}
-                    className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-1 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100 dark:bg-gray-700 dark:text-gray-200 dark:file:bg-gray-600 dark:file:text-gray-200 dark:hover:file:bg-gray-500"
-                    disabled={loading}
-                  />
-                </div>
+                {activeTab === 'alphaFold' && (
+                  <div>
+                    <label htmlFor="alphaFoldId" className="block text-sm font-medium text-gray-800 dark:text-gray-200">
+                      Enter AlphaFold Structure ID :
+                    </label>
+                    <input
+                      type="text"
+                      id="alphaFoldId"
+                      placeholder="e.g., AF-Q9Y2H1-F1 "
+                      className="mt-1 block w-full border border-gray-300 dark:border-gray-600 rounded-md shadow-sm p-3 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-gray-200"
+                      disabled={loading}
+                      readOnly // Making it read-only since it's a dummy tab
+                    />
+                   
+                  </div>
+                )}
 
                 <button
                   type="submit"
